@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SBLHACKER Bot - Pairing Code</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .phone-input {
+            display: flex;
+            align-items: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .phone-input:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .country-code {
+            padding: 15px 15px;
+            background: #f5f5f5;
+            border-radius: 13px 0 0 13px;
+            font-weight: 600;
+            color: #333;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            border-radius: 0 13px 13px 0;
+            background: transparent;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 30px;
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .code-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            margin-bottom: 15px;
+        }
+
+        .code-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .pairing-code {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 4px;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            margin-top: 10px;
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .whatsapp-link {
+            display: block;
+            background: #25D366;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+
+        .whatsapp-link:hover {
+            background: #128C7E;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .info-note {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #1976d2;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>𓆩 𝘴᥇ꪶꫝꪖᥴ𝘬ꫀ𝘳 ❦︎𓆪</h1>
+            <p>WhatsApp Bot Pairing System</p>
+        </div>
+
+        <div class="input-group">
+            <label>📱 WhatsApp Number</label>
+            <div class="phone-input">
+                <span class="country-code">+92</span>
+                <input type="number" id="phoneNumber" placeholder="3xxxxxxxxx" value="">
+            </div>
+            <small style="color: #666; display: block; margin-top: 5px;">Example: 3001234567 (without country code)</small>
+        </div>
+
+        <button id="generateBtn" onclick="generatePairingCode()">
+            🔗 Generate Pairing Code
+        </button>
+
+        <div id="result" class="result">
+            <div class="code-box">
+                <div class="code-label">🔑 YOUR PAIRING CODE</div>
+                <div class="pairing-code" id="pairingCode">- - - -</div>
+            </div>
+            <button class="copy-btn" onclick="copyCode()">
+                📋 Copy Code
+            </button>
+            <a href="#" id="whatsappLink" class="whatsapp-link" target="_blank">
+                💬 Open WhatsApp to Link Device
+            </a>
+        </div>
+
+        <div id="error" class="error"></div>
+        
+        <div class="info-note">
+            💡 After generating code, open WhatsApp → Linked Devices → Link a Device → Enter the 8-digit code
+        </div>
+
+        <div class="footer">
+            <p>© 2025 SBLHACKER | <a href="#">Bot Commands: .menu</a></p>
+        </div>
+    </div>
+
+    <script>
+        let currentCode = '';
+        let apiUrl = window.location.origin; // Use same domain for API
+
+        async function generatePairingCode() {
+            const phoneInput = document.getElementById('phoneNumber');
+            const phoneNumber = phoneInput.value.trim();
+            const errorDiv = document.getElementById('error');
+            const generateBtn = document.getElementById('generateBtn');
+            const resultDiv = document.getElementById('result');
+
+            // Validate phone number
+            if (!phoneNumber) {
+                showError('Please enter your WhatsApp number!');
+                return;
+            }
+
+            if (phoneNumber.length < 10 || phoneNumber.length > 12) {
+                showError('Please enter a valid WhatsApp number (10-12 digits)');
+                return;
+            }
+
+            // Show loading state
+            generateBtn.innerHTML = '<span class="loading"></span> Generating...';
+            generateBtn.disabled = true;
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+
+            const fullNumber = phoneNumber;
+
+            try {
+                const response = await fetch('/api/pair', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ number: fullNumber })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.code) {
+                    currentCode = data.code;
+                    document.getElementById('pairingCode').innerHTML = formatCode(currentCode);
+                    resultDiv.style.display = 'block';
+                    
+                    // Create WhatsApp link with code
+                    const waLink = `https://wa.me/92${fullNumber}?text=${encodeURIComponent(`My pairing code is: ${currentCode}\n\nOpen WhatsApp → Linked Devices → Link a Device → Enter this code`)}`;
+                    document.getElementById('whatsappLink').href = waLink;
+                    
+                    showSuccess('✅ Pairing code generated successfully!');
+                } else {
+                    showError(data.error || 'Failed to generate pairing code. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Network error. Please check your connection and try again.');
+            } finally {
+                generateBtn.innerHTML = '🔗 Generate Pairing Code';
+                generateBtn.disabled = false;
+            }
+        }
+
+        function formatCode(code) {
+            if (!code) return '- - - -';
+            return code.match(/.{1,4}/g).join(' - ');
+        }
+
+        function copyCode() {
+            if (!currentCode) {
+                showError('No code to copy!');
+                return;
+            }
+
+            navigator.clipboard.writeText(currentCode).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(() => {
+                showError('Failed to copy code. Please copy manually.');
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'error';
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.className = 'error success';
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
