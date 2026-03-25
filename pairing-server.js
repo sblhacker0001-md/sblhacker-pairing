@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const fs = require('fs');
 const Pino = require('pino');
 
@@ -41,6 +41,9 @@ app.post('/api/pair', async (req, res) => {
         cleanNumber = '92' + cleanNumber.slice(1);
     }
 
+    // Send immediate response to avoid timeout
+    res.setHeader('Content-Type', 'application/json');
+    
     try {
         const sessionId = Date.now().toString();
         const sessionDir = path.join(__dirname, 'temp_sessions', sessionId);
@@ -55,17 +58,28 @@ app.post('/api/pair', async (req, res) => {
             auth: state,
             printQRInTerminal: false,
             logger: Pino({ level: 'silent' }),
-            browser: ['SBLHACKER Bot', 'Chrome', '1.0.0'],
+            browser: ['Ubuntu', 'Chrome', '20.0.04'],
             defaultQueryTimeoutMs: undefined,
             connectTimeoutMs: 60000,
             keepAliveIntervalMs: 10000,
-            version: [2, 3000, 1015901307]  // ← Fixed version
+            version: [2, 3000, 1015901307],
+            generateHighQualityLinkPreview: false,
+            syncFullHistory: false,
+            markOnlineOnConnect: false
         });
 
         sock.ev.on('creds.update', saveCreds);
 
-        // Wait a bit before requesting code
-        await new Promise(r => setTimeout(r, 2000));
+        // Handle connection close
+        sock.ev.on('connection.update', (update) => {
+            const { connection, lastDisconnect } = update;
+            if (connection === 'close') {
+                console.log('Connection closed:', lastDisconnect?.error);
+            }
+        });
+
+        // Wait for connection
+        await new Promise(r => setTimeout(r, 3000));
         
         const pairingCode = await sock.requestPairingCode(cleanNumber);
         
@@ -89,11 +103,11 @@ app.post('/api/pair', async (req, res) => {
             }
         }, 5 * 60 * 1000);
 
-        res.json({ success: true, code: pairingCode });
+        return res.json({ success: true, code: pairingCode });
         
     } catch (error) {
         console.error('Pairing error:', error);
-        res.status(500).json({ error: error.message || 'Failed to generate pairing code' });
+        return res.status(500).json({ error: error.message || 'Failed to generate pairing code. Try again.' });
     }
 });
 
