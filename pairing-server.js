@@ -39,10 +39,6 @@ app.post('/api/pair', async (req, res) => {
         cleanNumber = '92' + cleanNumber;
     } else if (cleanNumber.length === 11 && cleanNumber.startsWith('0')) {
         cleanNumber = '92' + cleanNumber.slice(1);
-    } else if (!cleanNumber.startsWith('92') && cleanNumber.length === 12) {
-        // already has country code
-    } else {
-        return res.status(400).json({ error: 'Invalid number format' });
     }
 
     try {
@@ -59,11 +55,18 @@ app.post('/api/pair', async (req, res) => {
             auth: state,
             printQRInTerminal: false,
             logger: Pino({ level: 'silent' }),
-            browser: ['SBLHACKER Bot', 'Chrome', '1.0.0']
+            browser: ['SBLHACKER Bot', 'Chrome', '1.0.0'],
+            defaultQueryTimeoutMs: undefined,
+            connectTimeoutMs: 60000,
+            keepAliveIntervalMs: 10000,
+            version: [2, 3000, 1015901307]  // ← Fixed version
         });
 
         sock.ev.on('creds.update', saveCreds);
 
+        // Wait a bit before requesting code
+        await new Promise(r => setTimeout(r, 2000));
+        
         const pairingCode = await sock.requestPairingCode(cleanNumber);
         
         activePairings.set(cleanNumber, {
@@ -90,7 +93,7 @@ app.post('/api/pair', async (req, res) => {
         
     } catch (error) {
         console.error('Pairing error:', error);
-        res.status(500).json({ error: 'Failed to generate pairing code' });
+        res.status(500).json({ error: error.message || 'Failed to generate pairing code' });
     }
 });
 
